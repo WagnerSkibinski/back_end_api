@@ -1,11 +1,23 @@
 import requests
+import os
+from dotenv import load_dotenv
 
-BASE_URL = "http://localhost:8000/profissionais"
+load_dotenv()
 
+API_KEY = os.getenv("API_KEY")
+BASE_URL = os.getenv("BASE_URL")
+
+HEADERS = {
+    "X-API-KEY": API_KEY,
+    "Content-Type": "application/json"
+}
 
 
 def listar_profissionais():
-    response = requests.get(BASE_URL)
+    response = requests.get(
+        f"{BASE_URL}",
+        headers=HEADERS
+    )
 
     if response.status_code == 200:
         return response.json()
@@ -15,7 +27,11 @@ def listar_profissionais():
 
 
 def buscar_profissional(id_profissional):
-    response = requests.get(f"{BASE_URL}/{id_profissional}")
+    response = requests.get(
+        f"{BASE_URL}/profissional/{id_profissional}",
+        headers=HEADERS
+
+    )
 
     if response.status_code == 200:
         return response.json()
@@ -24,13 +40,7 @@ def buscar_profissional(id_profissional):
     return None
 
 
-def cadastrar_profissional(
-    nome,
-    especialidade,
-    crm,
-    telefone,
-    email
-):
+def cadastrar_profissional(nome,especialidade,crm,telefone,email):
 
     dados = {
         "nome": nome,
@@ -41,32 +51,20 @@ def cadastrar_profissional(
     }
 
     response = requests.post(
-        BASE_URL,
-        json=dados
+        f"{BASE_URL}/profissional",
+        json=dados,
+        headers=HEADERS
+        
     )
 
     return response.json()
 
-def editar_profissional(
-    id_profissional,
-    nome,
-    especialidade,
-    crm,
-    telefone,
-    email
-):
-
-    dados = {
-        "nome": nome,
-        "especialidade": especialidade,
-        "crm": crm,
-        "telefone": telefone,
-        "email": email
-    }
+def editar_profissional(id_profissional, dados):
 
     response = requests.put(
-        f"{BASE_URL}/{id_profissional}",
-        json=dados
+        f"{BASE_URL}/proficional/{id_profissional}",
+        json=dados,
+        headers=HEADERS
     )
 
     return response.json()
@@ -75,7 +73,8 @@ def editar_profissional(
 def excluir_profissional(id_profissional):
 
     response = requests.delete(
-        f"{BASE_URL}/{id_profissional}"
+        f"{BASE_URL}/profissional/{id_profissional}",
+        headers=HEADERS
     )
 
     if response.status_code == 200:

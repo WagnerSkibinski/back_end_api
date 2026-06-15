@@ -1,11 +1,22 @@
 import requests
+import os
+from dotenv import load_dotenv
 
-BASE_URL = "http://localhost:8000/pacientes"
+load_dotenv()
 
+API_KEY = os.getenv("API_KEY")
+BASE_URL = os.getenv("BASE_URL")
 
+HEADERS = {
+    "X-API-KEY": API_KEY,
+    "Content-Type": "application/json"
+}
 
 def listar_pacientes():
-    response = requests.get(BASE_URL)
+    response = requests.get(
+        f"{BASE_URL}/pacientes",
+        headers=HEADERS                            
+    )
 
     if response.status_code == 200:
         return response.json()
@@ -15,7 +26,10 @@ def listar_pacientes():
 
 
 def buscar_paciente(id_paciente):
-    response = requests.get(f"{BASE_URL}/{id_paciente}")
+    response = requests.get(
+        f"{BASE_URL}/pacientes/{id_paciente}",
+        headers=HEADERS
+        )
 
     if response.status_code == 200:
         return response.json()
@@ -24,14 +38,7 @@ def buscar_paciente(id_paciente):
     return None
 
 
-def cadastrar_paciente(
-    nome,
-    cpf,
-    telefone,
-    email,
-    data_nascimento,
-    endereco
-):
+def cadastrar_paciente(nome,cpf,telefone,email,data_nascimento,endereco):
 
     dados = {
         "nome": nome,
@@ -43,35 +50,20 @@ def cadastrar_paciente(
     }
 
     response = requests.post(
-        BASE_URL,
-        json=dados
+        f"{BASE_URL}/pacientes",
+        json=dados,
+        headers=HEADERS
     )
 
     return response.json()
 
 
-def editar_paciente(
-    id_paciente,
-    nome,
-    cpf,
-    telefone,
-    email,
-    data_nascimento,
-    endereco
-):
-
-    dados = {
-        "nome": nome,
-        "cpf": cpf,
-        "telefone": telefone,
-        "email": email,
-        "data_nascimento": data_nascimento,
-        "endereco": endereco
-    }
+def editar_paciente(id_paciente, dados):
 
     response = requests.put(
-        f"{BASE_URL}/{id_paciente}",
-        json=dados
+        f"{BASE_URL}/pacientes/{id_paciente}",
+        json=dados,
+        headers=HEADERS
     )
 
     return response.json()
@@ -80,7 +72,8 @@ def editar_paciente(
 def excluir_paciente(id_paciente):
 
     response = requests.delete(
-        f"{BASE_URL}/{id_paciente}"
+        f"{BASE_URL}/pacientes{id_paciente}",
+        headers=HEADERS
     )
 
     if response.status_code == 200:

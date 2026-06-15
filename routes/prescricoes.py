@@ -1,8 +1,24 @@
-BASE_URL = "http://localhost:8000/prescricoes"
+import requests
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+API_KEY = os.getenv("API_KEY")
+BASE_URL = os.getenv("BASE_URL")
+
+HEADERS = {
+    "X-API-KEY": API_KEY,
+    "Content-Type": "application/json"
+}
 
 
 def listar_prescricoes():
-    response = requests.get(BASE_URL)
+    response = requests.get(
+        f"{BASE_URL}/prescricoes",
+        headers=HEADERS
+        
+    )
 
     if response.status_code == 200:
         return response.json()
@@ -12,7 +28,10 @@ def listar_prescricoes():
 
 
 def buscar_prescricao(id_prescricao):
-    response = requests.get(f"{BASE_URL}/{id_prescricao}")
+    response = requests.get(
+        f"{BASE_URL}/prescriocoes/{id_prescricao}",
+        headers=HEADERS    
+    )
 
     if response.status_code == 200:
         return response.json()
@@ -21,13 +40,7 @@ def buscar_prescricao(id_prescricao):
     return None
 
 
-def cadastrar_prescricao(
-    paciente,
-    profissional,
-    medicamentos,
-    orientacoes,
-    data
-):
+def cadastrar_prescricao(paciente, profissional, medicamentos, orientacoes, data):
 
     dados = {
         "paciente": paciente,
@@ -38,33 +51,20 @@ def cadastrar_prescricao(
     }
 
     response = requests.post(
-        BASE_URL,
-        json=dados
+        f"{BASE_URL}/prescricoes",
+        json=dados,
+        headers=HEADERS
     )
 
     return response.json()
 
 
-def editar_prescricao(
-    id_prescricao,
-    paciente,
-    profissional,
-    medicamentos,
-    orientacoes,
-    data
-):
-
-    dados = {
-        "paciente": paciente,
-        "profissional": profissional,
-        "medicamentos": medicamentos,
-        "orientacoes": orientacoes,
-        "data": data
-    }
+def editar_prescricao(id_prescricao, dados):
 
     response = requests.put(
-        f"{BASE_URL}/{id_prescricao}",
-        json=dados
+        f"{BASE_URL}/prescricoes/{id_prescricao}",
+        json=dados,
+        headers=HEADERS
     )
 
     return response.json()
@@ -73,7 +73,8 @@ def editar_prescricao(
 def excluir_prescricao(id_prescricao):
 
     response = requests.delete(
-        f"{BASE_URL}/{id_prescricao}"
+        f"{BASE_URL}/prescricoes/{id_prescricao}",
+        headers=HEADERS
     )
 
     if response.status_code == 200:
