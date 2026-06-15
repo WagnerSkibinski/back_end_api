@@ -1,9 +1,7 @@
-import requests
-
-BASE_URL = "http://localhost:8000/consultas"
+BASE_URL = "http://localhost:8000/prescricoes"
 
 
-def listar_consultas():
+def listar_prescricoes():
     response = requests.get(BASE_URL)
 
     if response.status_code == 200:
@@ -13,32 +11,30 @@ def listar_consultas():
     return None
 
 
-
-def buscar_consulta(id_consulta):
-    response = requests.get(f"{BASE_URL}/{id_consulta}")
+def buscar_prescricao(id_prescricao):
+    response = requests.get(f"{BASE_URL}/{id_prescricao}")
 
     if response.status_code == 200:
         return response.json()
 
-    print("Consulta não encontrada.")
+    print("Prescrição não encontrada.")
     return None
 
 
-
-def cadastrar_consulta(
+def cadastrar_prescricao(
     paciente,
     profissional,
-    data,
-    hora,
-    tipo
+    medicamentos,
+    orientacoes,
+    data
 ):
 
     dados = {
         "paciente": paciente,
         "profissional": profissional,
-        "data": data,
-        "hora": hora,
-        "tipo": tipo
+        "medicamentos": medicamentos,
+        "orientacoes": orientacoes,
+        "data": data
     }
 
     response = requests.post(
@@ -49,40 +45,39 @@ def cadastrar_consulta(
     return response.json()
 
 
-def editar_consulta(
-    id_consulta,
+def editar_prescricao(
+    id_prescricao,
     paciente,
     profissional,
-    data,
-    hora,
-    tipo,
-    status
+    medicamentos,
+    orientacoes,
+    data
 ):
 
     dados = {
         "paciente": paciente,
         "profissional": profissional,
-        "data": data,
-        "hora": hora,
-        "tipo": tipo,
-        "status": status
+        "medicamentos": medicamentos,
+        "orientacoes": orientacoes,
+        "data": data
     }
 
     response = requests.put(
-        f"{BASE_URL}/{id_consulta}",
+        f"{BASE_URL}/{id_prescricao}",
         json=dados
     )
 
     return response.json()
 
 
-def excluir_consulta(id_consulta):
+def excluir_prescricao(id_prescricao):
 
     response = requests.delete(
-        f"{BASE_URL}/{id_consulta}"
+        f"{BASE_URL}/{id_prescricao}"
     )
 
     if response.status_code == 200:
-        print("Consulta excluída com sucesso.")
+        print("Prescrição excluída com sucesso.")
     else:
         print(response.text)
+

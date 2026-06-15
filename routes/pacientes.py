@@ -1,38 +1,89 @@
 import requests
 
+BASE_URL = "http://localhost:8000/pacientes"
 
 
-def get_clientes(id_paciente):
-    response = requests.get(f"http://localhost:8000/pacientes/{id_paciente}")
+
+def listar_pacientes():
+    response = requests.get(BASE_URL)
 
     if response.status_code == 200:
-        print(response.json())
-    else:
-        print(response.text)
-        
-        
-def post_clientes(nome, cpf, tel, email):
+        return response.json()
+
+    print("Erro:", response.text)
+    return None
+
+
+def buscar_paciente(id_paciente):
+    response = requests.get(f"{BASE_URL}/{id_paciente}")
+
+    if response.status_code == 200:
+        return response.json()
+
+    print("Paciente não encontrado.")
+    return None
+
+
+def cadastrar_paciente(
+    nome,
+    cpf,
+    telefone,
+    email,
+    data_nascimento,
+    endereco
+):
+
     dados = {
-    "nome": f"{nome}",
-    "cpf": f"{cpf}",
-    "telefone": f"{tel}",
-    "email": f"{email}"
+        "nome": nome,
+        "cpf": cpf,
+        "telefone": telefone,
+        "email": email,
+        "data_nascimento": data_nascimento,
+        "endereco": endereco
     }
 
     response = requests.post(
-        "http://localhost:8000/pacientes",
+        BASE_URL,
         json=dados
     )
 
-    print(response.status_code)
-    print(response.json())
-    
-    
-def delete_clientes(id_paciente):
-    response = requests.delete(
-    f"http://localhost:8000/pacientes/{id_paciente}"
+    return response.json()
+
+
+def editar_paciente(
+    id_paciente,
+    nome,
+    cpf,
+    telefone,
+    email,
+    data_nascimento,
+    endereco
+):
+
+    dados = {
+        "nome": nome,
+        "cpf": cpf,
+        "telefone": telefone,
+        "email": email,
+        "data_nascimento": data_nascimento,
+        "endereco": endereco
+    }
+
+    response = requests.put(
+        f"{BASE_URL}/{id_paciente}",
+        json=dados
     )
 
-    print(response.status_code)
-    print(response.text)
-    Minha dúvida
+    return response.json()
+
+
+def excluir_paciente(id_paciente):
+
+    response = requests.delete(
+        f"{BASE_URL}/{id_paciente}"
+    )
+
+    if response.status_code == 200:
+        print("Paciente excluído com sucesso.")
+    else:
+        print(response.text)
