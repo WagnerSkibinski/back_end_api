@@ -1,0 +1,27 @@
+[
+    {
+        "id": 1,
+        "nome": "Dr. Carlos",
+        "especialidade": "Cardiologia",
+        "crm": "12345",
+        "agenda": []
+    },
+    {
+        "id": 2,
+        "nome": "Dra. Ana Souza",
+        "especialidade": "Clinica Geral",
+        "crm": "54321",
+        "telefone": "41966665555",
+        "email": "ana@vidaplus.com",
+        "agenda": []
+    },
+    {
+        "id": 3,
+        "nome": "Dra. Ana Souza",
+        "especialidade": "Clinica Geral",
+        "crm": "54321",
+        "telefone": "41966665555",
+        "email": "ana@vidaplus.com",
+        "agenda": []
+    }
+]

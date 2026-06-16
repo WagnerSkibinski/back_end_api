@@ -1,0 +1,12 @@
+[
+    {
+        "id": 1,
+        "codigo": "A101",
+        "status": "Livre"
+    },
+    {
+        "id": 2,
+        "codigo": "A102",
+        "status": "Ocupado"
+    }
+]

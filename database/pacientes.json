@@ -1,0 +1,11 @@
+[
+    {
+        "id": 1,
+        "nome": "João Silva",
+        "cpf": "12345678900",
+        "telefone": "41977776666",
+        "email": "joao@email.com",
+        "historico": [],
+        "endereco": "Av. Central, 500"
+    }
+]

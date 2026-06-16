@@ -1,82 +1,77 @@
-import requests
-import os
-from dotenv import load_dotenv
+from flask import Blueprint, jsonify, request
 
-load_dotenv()
+from services.json_manager import append_log, load_data, next_id, save_data
 
-API_KEY = os.getenv("API_KEY")
-BASE_URL = os.getenv("BASE_URL")
 
-HEADERS = {
-    "X-API-KEY": API_KEY,
-    "Content-Type": "application/json"
-}
+pacientes_bp = Blueprint("pacientes", __name__)
 
+
+@pacientes_bp.get("/pacientes")
 def listar_pacientes():
-    response = requests.get(
-        f"{BASE_URL}/pacientes",
-        headers=HEADERS                            
-    )
-
-    if response.status_code == 200:
-        return response.json()
-
-    print("Erro:", response.text)
-    return None
+    
+    return jsonify(load_data("pacientes.json")), 200
 
 
+@pacientes_bp.get("/pacientes/<int:id_paciente>")
 def buscar_paciente(id_paciente):
-    response = requests.get(
-        f"{BASE_URL}/pacientes/{id_paciente}",
-        headers=HEADERS
-        )
-
-    if response.status_code == 200:
-        return response.json()
-
-    print("Paciente não encontrado.")
-    return None
+    pacientes = load_data("pacientes.json")
+    paciente = next((item for item in pacientes if item.get("id") == id_paciente), None)
+    if not paciente:
+        
+        return jsonify({"erro": "Paciente não encontrado"}), 404
+    return jsonify(paciente), 200
 
 
-def cadastrar_paciente(nome,cpf,telefone,email,data_nascimento,endereco):
+@pacientes_bp.post("/pacientes")
+def cadastrar_paciente():
+    dados = request.get_json(silent=True) or {}
+    campos = ["nome", "cpf", "telefone", "email", "data_nascimento", "endereco"]
+    faltando = [campo for campo in campos if campo not in dados]
+    if faltando:
+        return jsonify({"erro": "Campos obrigatórios ausentes", "campos": faltando}), 400
 
-    dados = {
-        "nome": nome,
-        "cpf": cpf,
-        "telefone": telefone,
-        "email": email,
-        "data_nascimento": data_nascimento,
-        "endereco": endereco
+    pacientes = load_data("pacientes.json")
+    novo = {
+        "id": next_id(pacientes),
+        
+        "nome": dados["nome"],
+        "cpf": dados["cpf"],
+        
+        "telefone": dados["telefone"],
+        
+        "email": dados["email"],
+        "data_nascimento": dados["data_nascimento"],
+        "endereco": dados["endereco"],
+        "historico": dados.get("historico", []),
     }
-
-    response = requests.post(
-        f"{BASE_URL}/pacientes",
-        json=dados,
-        headers=HEADERS
-    )
-
-    return response.json()
+    pacientes.append(novo)
+    save_data("pacientes.json", pacientes)
+    append_log("create", "pacientes", {"id": novo["id"]})
+    return jsonify(novo), 201
 
 
-def editar_paciente(id_paciente, dados):
+@pacientes_bp.put("/pacientes/<int:id_paciente>")
+def editar_paciente(id_paciente):
+    dados = request.get_json(silent=True) or {}
+    pacientes = load_data("pacientes.json")
 
-    response = requests.put(
-        f"{BASE_URL}/pacientes/{id_paciente}",
-        json=dados,
-        headers=HEADERS
-    )
+    for paciente in pacientes:
+        if paciente.get("id") == id_paciente:
+            paciente.update(dados)
+            save_data("pacientes.json", pacientes)
+            append_log("update", "pacientes", {"id": id_paciente})
+            return jsonify(paciente), 200
 
-    return response.json()
+    return jsonify({"erro": "Paciente não encontrado"}), 404
 
 
+@pacientes_bp.delete("/pacientes/<int:id_paciente>")
 def excluir_paciente(id_paciente):
+    pacientes = load_data("pacientes.json")
+    atualizados = [item for item in pacientes if item.get("id") != id_paciente]
+    if len(atualizados) == len(pacientes):
+        return jsonify({"erro": "Paciente não encontrado"}), 404
 
-    response = requests.delete(
-        f"{BASE_URL}/pacientes{id_paciente}",
-        headers=HEADERS
-    )
-
-    if response.status_code == 200:
-        print("Paciente excluído com sucesso.")
-    else:
-        print(response.text)
+    save_data("pacientes.json", atualizados)
+    append_log("delete", "pacientes", {"id": id_paciente})
+    return jsonify({"mensagem": "Paciente excluído com sucesso"}), 200
